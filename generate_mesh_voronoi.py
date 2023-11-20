@@ -6,15 +6,15 @@
 ###                                                                          ###
 ################################################################################
 
-    import math
-    import meshio
-    import gmsh
-    import os
-    import pickle
-    import dolfin
-    import numpy
-    import scipy
-    import matplotlib.pyplot as plt
+import math
+import meshio
+import gmsh
+import os
+import pickle
+import dolfin
+import numpy
+import scipy
+import matplotlib.pyplot as plt
 
 ################################################################################
 
@@ -27,7 +27,7 @@ def generate_mesh_voronoi(
         shift_y,
         remove_seeds = True):
 
-    ########## Initialization###################################################
+    ########## Initialization ##################################################
 
     gmsh.initialize()
     gmsh.clear()
