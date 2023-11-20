@@ -6,8 +6,6 @@
 ###                                                                          ###
 ################################################################################
 
-def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds = True):
-
     import math
     import meshio
     import gmsh
@@ -18,23 +16,33 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
     import scipy
     import matplotlib.pyplot as plt
 
+################################################################################
 
-    ########## Initialization#######################################################
+def generate_mesh_voronoi(
+        mesh_filename,
+        h, # wall thickness
+        lcar, # element size
+        row,
+        domain_y,
+        shift_y,
+        remove_seeds = True):
 
+    ########## Initialization###################################################
 
     gmsh.initialize()
     gmsh.clear()
     model = gmsh.model
     occ = model.occ
 
-    ############# Parameters #######################################################
+    ############# Parameters ###################################################
 
-    lcar = h/5
     l = 0
-    ############# Functions ########################################################
+
+    ############# Functions ####################################################
 
     def line_btw_points(P, Q):
-    #Returns the line parameter between two points
+        # Returns the line parameter between two points
+        
         # by = ax + c
         a = Q[1] - P[1]
         b = Q[0] - P[0]
@@ -43,13 +51,15 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
         return a, b, c
 
     def line_2_points(P, Q):
-    #Returns the line parameter between two points
+        # Returns the line parameter between two points
+        
         m = (Q[1] - P[1])/(Q[0] - P[0])
         c = P[1] - m * P[0]
         return m, c
 
     def perpendicular_line(P, Q, a, b, c):
-    #Returns the perpendicular line to a line passing two points
+        # Returns the perpendicular line to a line passing two points
+        
         mid_point = [(P[0] + Q[0])/2, (P[1] + Q[1])/2]
 
         # ay = -bx + d
@@ -60,13 +70,15 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
         return a, b, c
 
     def lines_Intersect(m1, c1, m2, c2):
-    # Returns the intersection point of two lines
+        # Returns the intersection point of two lines
+        
         x = (c2 - c1)/(m1 - m2)
         y = (m2*c1 - m1*c2)/(m2 - m1)
         return [x, y]
 
     def lines_Intersection(a1, b1, c1, a2, b2, c2):
-    # Returns the intersection point of two lines
+        # Returns the intersection point of two lines
+        
         determinant = a1 * b2 - a2 * b1
         if (determinant == 0):
             # The lines are parallel. This is simplified
@@ -77,8 +89,8 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
             y = (a1 * c2 - a2 * c1)/determinant
             return [x, y]
 
-
     def vertice_generator(P, Q, S):
+
         a1, b1, c1 = line_btw_points(P, Q)
         a2, b2, c2 = line_btw_points(Q, S)
         a1, b1, c1 = perpendicular_line(P, Q, a1,b1,c1)
@@ -87,6 +99,7 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
         return [x, y]
 
     def find_neighbour_triangles(triangle_num, triangle, triangles_cor):
+
         neighbors = []
         neighbors.append(triangle_num)
         for i in range(len(triangles_cor)):
@@ -100,14 +113,13 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
 
         return neighbors
 
-
     def one_points_intersection(neighbor_vertices, vertices, lines):
 
         lines.append([vertices[neighbor_vertices[0]][1]])
         return lines
 
-
     def two_points_intersection(neighbor_vertices, vertices, lines):
+
         mid_point = vertices[neighbor_vertices[0]][1]
         side_point_1 = vertices[neighbor_vertices[1]][1]
         side_point_2 = vertices[neighbor_vertices[2]][1]
@@ -115,7 +127,6 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
         mid_point_num = neighbor_vertices[0]
         side_point_1_num = neighbor_vertices[1]
         side_point_2_num = neighbor_vertices[2]
-
 
         m1, c1 = line_2_points(mid_point,side_point_1)
         beta = math.atan(m1)
@@ -134,7 +145,6 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
             point_up_1 = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
             c1_up = point_up_1[1] - m1 * point_up_1[0]
 
-
         m2, c2 = line_2_points(mid_point,side_point_2)
         beta = math.atan(m2)
         sin = math.sin(beta)
@@ -152,9 +162,6 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
             point_up_2 = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
             c2_up = point_up_2[1] - m2 * point_up_2[0]
 
-
-
-
         mid_point_up = lines_Intersect(m1, c1_up, m2, c2_down)
         mid_point_down = lines_Intersect(m1, c1_down, m2, c2_up)
 
@@ -162,12 +169,14 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
         return lines
 
     def getAngle(a, b, c):
+
         ang = math.degrees(math.atan2(c[1]-b[1], c[0]-b[0]) - math.atan2(a[1]-b[1], a[0]-b[0]))
         return ang + 360 if ang < 0 else ang
 
     def three_points_intersection(neighbor_vertices, vertices, lines):
-        # This function gets a triangle ceter seed which has three neighnors and returns a
+        # This function gets a triangle center seed which has three neighbors and returns a
         # small mesh triangle around the triangle centers
+
         mid_point = vertices[neighbor_vertices[0]][1]
         side_point_1 = vertices[neighbor_vertices[1]][1]
         side_point_2 = vertices[neighbor_vertices[2]][1]
@@ -178,7 +187,6 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
         side_point_1_num = neighbor_vertices[1]
         side_point_2_num = neighbor_vertices[2]
         side_point_3_num = neighbor_vertices[3]
-
 
         m = numpy.zeros(3)
         c = numpy.zeros(3)
@@ -202,10 +210,9 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
                 point_up = [mid_point[0] + h/2 * sin, mid_point[1] - h/2 * cos]
                 c_up[i] = point_up[1] - m[i] * point_up[0]
 
-
-
         gamma2 = getAngle(side_points[0], mid_point, side_points[1])
         gamma3 = getAngle(side_points[0], mid_point, side_points[2])
+
         # If clockwise:
         if gamma2 > gamma3:
             mid_point_12 = lines_Intersect(m[0], c_up[0], m[1], c_down[1])
@@ -218,40 +225,36 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
             mid_point_23 = lines_Intersect(m[1], c_down[1], m[2], c_up[2])
             mid_point_31 = lines_Intersect(m[2], c_down[2], m[0], c_up[0])
 
-
         lines.append([mid_point_num, [side_point_1_num , side_point_2_num, mid_point_12], [side_point_2_num, side_point_3_num, mid_point_23], [side_point_3_num, side_point_1_num, mid_point_31]])
+
         return lines
 
-#### ###########################################
-
-#  domain = 10
-
+    ############# Mesh generation ##############################################
 
     seeds_filename = "point_seeds"
     open_file = open(seeds_filename, "rb")
     points = pickle.load(open_file)
     open_file.close()
 
-    if (remove_seeds is True): 
-        os.remove("point_seeds")  # Deleting the seeds file, created in seeds.py
+    if (remove_seeds is True):
+        os.remove("point_seeds")
+
+    nb_points = len(points)
 
     vor = scipy.spatial.Voronoi(points)
     # fig = scipy.spatial.voronoi_plot_2d(vor)
     # plt.savefig('Voronoi.jpg')
-    num = len(points)
 
-    period_neighbor_points_1 = numpy.zeros((num,2))
-    period_neighbor_points_2 = numpy.zeros((num,2))
-    period_neighbor_points_3 = numpy.zeros((num,2))
-    period_neighbor_points_4 = numpy.zeros((num,2))
-    period_neighbor_points_5 = numpy.zeros((num,2))
-    period_neighbor_points_6 = numpy.zeros((num,2))
-    period_neighbor_points_7 = numpy.zeros((num,2))
-    period_neighbor_points_8 = numpy.zeros((num,2))
-
+    period_neighbor_points_1 = numpy.zeros((nb_points,2))
+    period_neighbor_points_2 = numpy.zeros((nb_points,2))
+    period_neighbor_points_3 = numpy.zeros((nb_points,2))
+    period_neighbor_points_4 = numpy.zeros((nb_points,2))
+    period_neighbor_points_5 = numpy.zeros((nb_points,2))
+    period_neighbor_points_6 = numpy.zeros((nb_points,2))
+    period_neighbor_points_7 = numpy.zeros((nb_points,2))
+    period_neighbor_points_8 = numpy.zeros((nb_points,2))
 
     domain_x = domain_y * numpy.sqrt(3)/1.5/2
-    
 
     for i in range(len(points)):
         period_neighbor_points_1[i][0] = points[i][0] - domain_x
@@ -277,16 +280,13 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
 
         period_neighbor_points_8[i][0] = points[i][0] + domain_x
         period_neighbor_points_8[i][1] = points[i][1] - domain_y
-
     
     points = numpy.concatenate((points, period_neighbor_points_1, period_neighbor_points_2, period_neighbor_points_3, period_neighbor_points_4, period_neighbor_points_5, period_neighbor_points_6, period_neighbor_points_7, period_neighbor_points_8))
 
     tri = scipy.spatial.Delaunay(points)
 
-
     plt.plot(points[:,0], points[:,1], 'o')
     plt.triplot(points[:,0], points[:,1], tri.simplices)
-
 
     # Put each triangle corners in one group
 
@@ -294,21 +294,19 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
     number_of_triangels = len(triangles_cor)
 
     # Find vertices for each triangle
-    # Put each triangle corners and its vertice in one group and make a list, please
+    # Put each triangle corners and its vertices in one group and make a list, please
     vertices = []
     for i in range(number_of_triangels):
         vertices.append([triangles_cor[i], vertice_generator(points[triangles_cor[i, 0]], points[triangles_cor[i, 1]], points[triangles_cor[i, 2]])])
 
-
-    # Find the neighbour triangles
+    # Find the neighbor triangles
     neighbor_triangles_by_number = []
     for i in range(number_of_triangels):
         neighbor_triangles_by_number.append(find_neighbour_triangles(i, triangles_cor[i], triangles_cor))
 
+    # Put neighbor triangles vertices in one group which shows the ridge of Voronoi tessellation
 
-    # Put neighbour triangles vertices in one group which shows the ridge of Voronoi tessellation
-
-    lines = []      # lines contains each triangle (vertice) number with the side points
+    lines = []      # lines contains each triangle (vertices) number with the side points
     for i in range (len(neighbor_triangles_by_number)):
         if len(neighbor_triangles_by_number[i]) == 2:
             lines = one_points_intersection(neighbor_triangles_by_number[i], vertices, lines)
@@ -316,8 +314,6 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
             lines = two_points_intersection(neighbor_triangles_by_number[i], vertices, lines)
         if len(neighbor_triangles_by_number[i]) == 4:
             lines = three_points_intersection(neighbor_triangles_by_number[i], vertices, lines)
-
-
 
     surfaces = []
 
@@ -354,9 +350,6 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
 
                     surfaces.append([i, neighbor_num, l])
 
-    # shift_y = 0
-    # shift_y = -0.2
-    # gmsh.initialize()
     occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, 0+shift_y, 0, lcar), occ.addPoint(domain_x, 0+shift_y, 0, lcar)),\
                                         occ.addLine(occ.addPoint(domain_x, 0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
                                         occ.addLine(occ.addPoint(domain_x, domain_y+shift_y, 0, lcar), occ.addPoint(0, domain_y+shift_y, 0, lcar)),\
@@ -365,14 +358,10 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
     base = 'occ.fuse([(2,1)], [(2,2)'
     for i in range(l-2):
         base = base + ',(2,' + str(i+3) + ')'
-
     command = base + '], 30000)'
-
     exec(command)
 
     frame = occ.cut([(2, 20000)], [(2, 30000)])
-
-    
 
     occ.addPlaneSurface([occ.addCurveLoop([occ.addLine(occ.addPoint(0, 0+shift_y, 0, lcar), occ.addPoint(domain_x, 0+shift_y, 0, lcar)),\
                                         occ.addLine(occ.addPoint(domain_x, 0+shift_y, 0, lcar), occ.addPoint(domain_x, domain_y+shift_y, 0, lcar)),\
@@ -382,26 +371,13 @@ def generate_mesh_voronoi(mesh_filename, h, row, domain_y, shift_y, remove_seeds
     base = 'occ.cut([(2, 20001)], [(2, 1)'
     for i in range(len(frame[0])-1):
         base = base + ',(2,' + str(i+2) + ')'
-
     command = base + '], 40000)'
     exec(command)
-    gmsh.option.setNumber("Mesh.MeshSizeMax", lcar)
 
+    gmsh.option.setNumber("Mesh.MeshSizeMax", lcar)
     
     occ.synchronize()
     mat = gmsh.model.addPhysicalGroup(2, [40000])
-    # gmsh.model.addPhysicalGroup(2, [40000])
-    # gmsh.model.addPhysicalGroup(1, [124], 1)
-    # gmsh.model.addPhysicalGroup(1, [169, 176], 2)
-    # gmsh.model.addPhysicalGroup(1, [122], 3)
-    # gmsh.model.addPhysicalGroup(1, [123], 4)
-    # gmsh.model.addPhysicalGroup(1, [155], 5)
-    # gmsh.model.addPhysicalGroup(1, [168], 6)
-    # gmsh.model.addPhysicalGroup(1, [161, 162], 7)
-    # gmsh.model.addPhysicalGroup(1, [164, 165, 166], 8)
-    # gmsh.model.addPhysicalGroup(1, [157, 158, 159], 9)
-    # gmsh.model.addPhysicalGroup(1, [170, 171, 172, 173, 174, 175], 10)
-    # gmsh.model.geo.rotate(gmsh.model.occ.getEntities(40000), 0, 0, 0, 0, 1, 1, math.pi / 4)
     
     zmin = 0; zmax = 0
     ymin = 0+shift_y; ymax = domain_y+shift_y

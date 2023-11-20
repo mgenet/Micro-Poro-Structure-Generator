@@ -7,11 +7,10 @@
 ################################################################################
 
 import geometry
-import seeds
-import homogenized_parameters
+import generate_seeds_random
 import math
 import os
-import numpy as np
+import numpy
 
 ################################################################################
 
@@ -56,7 +55,7 @@ if geo == 'hexagon_RVE1':
 
 
     fname = 'Geometries/Hexagon/' + geo #+ '_voronoi'
-    seeds.semi_regular(DoI, row, domain)
+    points = generate_seeds_random.semi_regular(DoI, row, domain)
     geometry.voronoi(fname, thickness, row, domain, shift_y, seeds_remove=True)
 
 if geo == 'hexagon_RVE1_voronoi':
@@ -80,7 +79,7 @@ if geo == 'hexagon_RVE2':
     shift_y = -0.2
 
     fname = 'Geometries/Hexagon/' + geo
-    seeds.semi_regular(DoI, row, domain)
+    generate_seeds_random.semi_regular(DoI, row, domain)
     geometry.voronoi(fname, thickness, row, domain, shift_y, seeds_remove=True)
     
 
@@ -223,7 +222,7 @@ if geo == 'hexag_incl':
     b = math.sin(t)*a
     c = a * math.cos(t)
     vol = a * b
-    mesh_corners = np.array([[0, 0.],
+    mesh_corners = numpy.array([[0, 0.],
                          [a, 0.],
                          [a+c, b],
                          [c, b]])
