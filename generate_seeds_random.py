@@ -9,13 +9,16 @@
 
 import numpy
 
-import micro_poro_seeds_generator as gen
+import micro_poro_structure_generator as gen
 
 ################################################################################
 
-def generate_seeds_random(nb_seeds):
+def generate_seeds_random(
+        nb_seeds,
+        seeds_filename="seeds.dat"):
+
     seeds = numpy.random.rand(nb_seeds, 2)
 
-    gen.write_seeds_to_file(seeds, "point_seeds")
+    gen.write_seeds_to_file(seeds, seeds_filename)
 
     return seeds

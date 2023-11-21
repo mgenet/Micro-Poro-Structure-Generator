@@ -10,11 +10,15 @@
 import numpy
 import random
 
-import micro_poro_seeds_generator as gen
+import micro_poro_structure_generator as gen
 
 ################################################################################
 
-def generate_seeds_semi_regular(DoI, row, domain_y):    
+def generate_seeds_semi_regular(
+        DoI,
+        row,
+        domain_y,
+        seeds_filename="seeds.dat"):
 
     def odd_position(column_number, row_number):
         #This funcrtion creates seeds in a row for odd columns
@@ -63,6 +67,6 @@ def generate_seeds_semi_regular(DoI, row, domain_y):
             k += 1
     print(seeds)
 
-    gen.write_seeds_to_file(seeds, "point_seeds")
+    gen.write_seeds_to_file(seeds, seeds_filename)
 
     return seeds
