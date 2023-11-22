@@ -21,5 +21,5 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
-    install_requires=["gmsh", "matplotlib", "numpy", "scipy", "pickle", "math", "random", "pickle"],
+    install_requires=["gmsh", "matplotlib", "numpy", "scipy", "math", "random", "pickle5"],
 )
