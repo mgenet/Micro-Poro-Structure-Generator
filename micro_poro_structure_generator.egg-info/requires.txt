@@ -1,0 +1,7 @@
+gmsh
+matplotlib
+numpy
+scipy
+pickle
+math
+random

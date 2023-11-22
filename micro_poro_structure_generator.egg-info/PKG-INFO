@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: micro-poro-structure-generator
+Version: 2023.11.22
+Home-page: https://github.com/ManoochTayebi/micro_poro_structure_generator
+Author: Mahdi Manoochehrtayebi, Martin Genet
+Author-email: mahdimtayebi@gmail.com
+License: GPLv3
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# Geometry Generator
+
+Library used in [Manoochehrtayebi, Bel-Brunon & Genet, Finite strain micro-poro-mechanics: formulation and compared analysis with macro-poro-mechanics. To be submitted.]
+
+Demos available in [demos.ipynb](demos.ipynb)
