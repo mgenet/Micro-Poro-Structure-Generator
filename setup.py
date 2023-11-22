@@ -8,7 +8,7 @@ version = datetime.date.today().strftime("%Y.%m.%d")
 setuptools.setup(
     name="micro_poro_structure_generator",
     # version=version,
-    version="0.0.2",
+    version="0.0.4",
     author="Mahdi Manoochehrtayebi, Martin Genet",
     author_email="mahdimtayebi@gmail.com",
     description=open("README.md", "r").readlines()[1][:-1],
@@ -22,5 +22,5 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
-    install_requires=["gmsh", "matplotlib", "numpy", "scipy", "random"],
+    install_requires=["gmsh", "matplotlib", "numpy", "scipy"],
 )

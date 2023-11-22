@@ -2,4 +2,3 @@ gmsh
 matplotlib
 numpy
 scipy
-random
