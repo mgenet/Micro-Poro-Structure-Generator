@@ -12,7 +12,7 @@ import numpy
 import os
 import pickle
 import scipy
-from scipy.spatial import Delaunay
+import scipy.spatial
 
 import micro_poro_structure_generator as gen
 
@@ -271,8 +271,7 @@ def generate_mesh_2D_rectangle_w_voronoi_inclusions(
     
     points = numpy.concatenate((points, period_neighbor_points_1, period_neighbor_points_2, period_neighbor_points_3, period_neighbor_points_4, period_neighbor_points_5, period_neighbor_points_6, period_neighbor_points_7, period_neighbor_points_8))
 
-    # tri = scipy.spatial.Delaunay(points)
-    tri = Delaunay(points)
+    tri = scipy.spatial.Delaunay(points)
 
     # plt.plot(points[:,0], points[:,1], 'o')
     # plt.triplot(points[:,0], points[:,1], tri.simplices)
