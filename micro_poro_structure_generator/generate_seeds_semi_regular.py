@@ -21,7 +21,7 @@ def generate_seeds_semi_regular(
         seeds_filename="seeds.dat"):
 
     def odd_position(column_number, row_number):
-        #This funcrtion creates seeds in a row for odd columns
+        #This function creates seeds in a row for odd columns
 
         cell_center = [cell_width * column_number + cell_width/2,  (2 * cell_height * row_number + cell_height/2)]
 
@@ -32,7 +32,7 @@ def generate_seeds_semi_regular(
         return(random_point)
 
     def even_position(column_number, row_number):
-        #This funcrtion creates seeds in a row for even columns
+        #This function creates seeds in a row for even columns
         cell_center = [cell_width * column_number, (2* cell_height * row_number + 3*cell_height/2)]
 
         left_treshold = cell_center[0] - width_treshold/2
