@@ -7,8 +7,7 @@ version = datetime.date.today().strftime("%Y.%m.%d")
 
 setuptools.setup(
     name="micro_poro_structure_generator",
-    # version=version,
-    version="0.0.5",
+    version=version,
     author="Mahdi Manoochehrtayebi, Martin Genet",
     author_email="mahdimtayebi@gmail.com",
     description=open("README.md", "r").readlines()[1][:-1],
