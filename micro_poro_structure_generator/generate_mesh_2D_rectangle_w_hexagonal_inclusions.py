@@ -83,3 +83,6 @@ def generate_mesh_2D_rectangle_w_hexagonal_inclusions(
     gen.convert_vtk_to_xdmf(mesh_filename, dim=2)
 
     gmsh.finalize()
+
+    Phif0 = gen.compute_porosity_2D_using_fenics(mesh_filename)
+    return Phif0
