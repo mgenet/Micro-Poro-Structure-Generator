@@ -11,38 +11,41 @@ import os
 
 ################################################################################
 
-def setPeriodic(coord, xmin, ymin, zmin, xmax, ymax, zmax, e):
+def setPeriodic(dim, coord, xmin, ymin, zmin, xmax, ymax, zmax, e=1e-6):
     # From https://gitlab.onelab.info/gmsh/gmsh/-/issues/744
 
-    smin = gmsh.model.getEntitiesInBoundingBox(
-        xmin - e,
-        ymin - e,
-        zmin - e,
-        (xmin + e) if (coord == 0) else (xmax + e),
-        (ymin + e) if (coord == 1) else (ymax + e),
-        (zmin + e) if (coord == 2) else (zmax + e),
-        2)
-    dx = (xmax - xmin) if (coord == 0) else 0
-    dy = (ymax - ymin) if (coord == 1) else 0
-    dz = (zmax - zmin) if (coord == 2) else 0
+    dx = (xmax - xmin) if (coord == 0) else 0.
+    dy = (ymax - ymin) if (coord == 1) else 0.
+    dz = (zmax - zmin) if (coord == 2) else 0.
+    d = max(dx, dy, dz)
+    e *= d
 
+    smin = gmsh.model.getEntitiesInBoundingBox(
+        xmin      - e, ymin      - e, zmin      - e,
+        xmax - dx + e, ymax - dy + e, zmax - dz + e,
+        dim-1)
+    # print ("smin:",smin)
     for i in smin:
-        bb = gmsh.model.getBoundingBox(i[0], i[1])
-        bbe = [bb[0] - e + dx, bb[1] - e + dy, bb[2] - e + dz,
-               bb[3] + e + dx, bb[4] + e + dy, bb[5] + e + dz]
-        smax = gmsh.model.getEntitiesInBoundingBox(bbe[0], bbe[1], bbe[2],
-                                                   bbe[3], bbe[4], bbe[5])
+        bb = gmsh.model.getBoundingBox(*i)
+        bbe = [bb[0] + dx, bb[1] + dy, bb[2] + dz,
+               bb[3] + dx, bb[4] + dy, bb[5] + dz]
+        smax = gmsh.model.getEntitiesInBoundingBox(
+            bbe[0] - e, bbe[1] - e, bbe[2] - e,
+            bbe[3] + e, bbe[4] + e, bbe[5] + e,
+            dim-1)
+        # print ("smax:",smax)
         for j in smax:
-            bb2 = list(gmsh.model.getBoundingBox(j[0], j[1]))
-            bb2[0] -= dx; bb2[1] -= dy; bb2[2] -= dz
-            bb2[3] -= dx; bb2[4] -= dy; bb2[5] -= dz
-            if ((abs(bb2[0] - bb[0]) < e) and (abs(bb2[1] - bb[1]) < e) and
-                (abs(bb2[2] - bb[2]) < e) and (abs(bb2[3] - bb[3]) < e) and
-                (abs(bb2[4] - bb[4]) < e) and (abs(bb2[5] - bb[5]) < e)):
-                gmsh.model.mesh.setPeriodic(2, [j[1]], [i[1]], [1, 0, 0, dx,\
-                                                                0, 1, 0, dy,\
-                                                                0, 0, 1, dz,\
-                                                                0, 0, 0, 1 ])
+            bb2 = gmsh.model.getBoundingBox(*j)
+            bb2e = [bb2[0] - dx, bb2[1] - dy, bb2[2] - dz,
+                    bb2[3] - dx, bb2[4] - dy, bb2[5] - dz]
+            if (numpy.linalg.norm(numpy.asarray(bb2e) - numpy.asarray(bb)) < e):
+                gmsh.model.mesh.setPeriodic(
+                    dim-1,
+                    [j[1]], [i[1]],
+                    [1, 0, 0, dx,\
+                     0, 1, 0, dy,\
+                     0, 0, 1, dz,\
+                     0, 0, 0, 1 ])
 
 ################################################################################
 

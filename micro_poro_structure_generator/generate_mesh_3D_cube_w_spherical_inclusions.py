@@ -61,9 +61,9 @@ def generate_mesh_3D_cube_w_spherical_inclusions(
     gmsh.model.occ.cut(objectDimTags=[(3, box_tag)], toolDimTags=[(3, hole_tag1), (3, hole_tag2), (3, hole_tag3), (3, hole_tag4), (3, hole_tag5), (3, hole_tag6), (3, hole_tag7), (3, hole_tag8)], tag=rve_tag)
     gmsh.model.occ.synchronize()
     gmsh.model.addPhysicalGroup(dim=3, tags=[rve_tag])
-    gen.setPeriodic(coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
-    gen.setPeriodic(coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
-    gen.setPeriodic(coord=2, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=3, coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=3, coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=3, coord=2, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
 
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=lcar)
     gmsh.model.mesh.generate(dim=3)
