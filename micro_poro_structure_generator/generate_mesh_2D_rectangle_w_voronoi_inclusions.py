@@ -371,8 +371,8 @@ def generate_mesh_2D_rectangle_w_voronoi_inclusions(
     xmin = 0
     xmax = domain_x
     e = 1e-6
-    gen.setPeriodic(coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
-    gen.setPeriodic(coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=2, coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=2, coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
 
     gmsh.model.mesh.generate()
 

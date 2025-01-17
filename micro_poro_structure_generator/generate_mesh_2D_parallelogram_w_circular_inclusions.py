@@ -55,8 +55,8 @@ def generate_mesh_2D_parallelogram_w_circular_inclusions(
     occ.synchronize()
     gmsh.model.addPhysicalGroup(2, [6])
 
-    gen.setPeriodic(coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
-    gen.setPeriodic(coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=2, coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=2, coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=lcar)
     gmsh.model.mesh.generate(dim=2)
 

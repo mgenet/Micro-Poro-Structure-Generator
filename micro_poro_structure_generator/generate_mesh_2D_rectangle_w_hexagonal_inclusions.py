@@ -69,8 +69,8 @@ def generate_mesh_2D_rectangle_w_hexagonal_inclusions(
 
     gmsh.model.addPhysicalGroup(2, [1000])
 
-    gen.setPeriodic(coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
-    gen.setPeriodic(coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=2, coord=0, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
+    gen.setPeriodic(dim=2, coord=1, xmin=xmin, ymin=ymin, zmin=zmin, xmax=xmax, ymax=ymax, zmax=zmax, e=e)
     gmsh.model.mesh.setSize(dimTags=gmsh.model.getEntities(0), size=lcar)
     gmsh.model.mesh.generate(dim=2)
 
